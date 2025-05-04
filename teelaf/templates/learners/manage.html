@@ -1,0 +1,369 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<style>
+.form-bg {
+    background: #1d4d8e !important;
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    color: #fff;
+}
+.form-bg .form-label {
+    color: #fff !important;
+}
+.form-bg .form-control {
+    background: #eaf6fa;
+}
+.form-bg .form-container {
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+/* Autres styles existants (table, recap, footer, etc.) */
+</style>
+
+<div class="container-fluid px-2 px-md-5 py-3">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+
+      <!-- Titre principal ajouté -->
+      <h2 class="text-center mb-4 fw-bold" style="letter-spacing:1px; color:#1d4d8e;">
+        FORMULAIRE D'ENREGISTREMENT DES APPRENANTS
+      </h2>
+
+      <!-- Bloc formulaire stylé façon "dépenses" -->
+      <div class="card mb-4">
+        <div class="card-header text-center" style="background: #1d4d8e; color: #fff;">
+            Ajouter un apprenant
+        </div>
+        <div class="card-body form-bg">
+            {% if form.errors %}
+              <div class="alert alert-danger mt-2">
+                {{ form.errors }}
+              </div>
+            {% endif %}
+            {% crispy form 'bootstrap5' %}
+        </div>
+      </div>
+
+      <!-- Bloc récapitulatif sous le formulaire -->
+      <div class="my-3 p-3 bg-light rounded-3 border text-center" id="recap-stats">
+        <h5 class="mb-3 fw-bold" style="letter-spacing:1px;">Récapitulatif</h5>
+        <div class="d-flex flex-wrap justify-content-center gap-3">
+          <div class="recap-item">
+            <div class="recap-label">Total</div>
+            <div class="recap-value" id="recap-total">{{ total_count }}</div>
+          </div>
+          <div class="recap-item">
+            <div class="recap-label">Etudiants</div>
+            <div class="recap-value" id="recap-etudiants">{{ etudiant_count }}</div>
+          </div>
+          <div class="recap-item">
+            <div class="recap-label">Entrepreneurs</div>
+            <div class="recap-value" id="recap-entrepreneurs">{{ entrepreneur_count }}</div>
+          </div>
+          <div class="recap-item">
+            <div class="recap-label">Professionnels</div>
+            <div class="recap-value" id="recap-professionnels">{{ professionnel_count }}</div>
+          </div>
+          <div class="recap-item">
+            <div class="recap-label">Au chômage</div>
+            <div class="recap-value" id="recap-chomage">{{ chomage_count }}</div>
+          </div>
+          <div class="recap-item">
+            <div class="recap-label">Oui</div>
+            <div class="recap-value" id="recap-oui">{{ oui_count }}</div>
+          </div>
+          <div class="recap-item">
+            <div class="recap-label">Non</div>
+            <div class="recap-value" id="recap-non">{{ non_count }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zone de filtres dynamiques avec fond gris -->
+      <div class="my-3 p-3 rounded-3 border d-flex flex-wrap align-items-center gap-3 justify-content-center"
+           id="filter-zone"
+           style="background-color: #f2f2f2;">
+        <div>
+          <label for="filter-name" class="form-label mb-1">Nom complet</label>
+          <input type="text" id="filter-name" class="form-control form-control-sm" placeholder="Filtrer par nom...">
+        </div>
+        <div>
+          <label for="filter-phone" class="form-label mb-1">Téléphone</label>
+          <input type="text" id="filter-phone" class="form-control form-control-sm" placeholder="Filtrer par téléphone...">
+        </div>
+        <div>
+          <label for="filter-statut" class="form-label mb-1">Statut</label>
+          <input type="text" id="filter-statut" class="form-control form-control-sm" placeholder="Filtrer par statut...">
+        </div>
+        <div>
+          <label for="filter-observation" class="form-label mb-1">Observation</label>
+          <input type="text" id="filter-observation" class="form-control form-control-sm" placeholder="Filtrer par observation...">
+        </div>
+      </div>
+
+      <hr>
+
+      <h3 class="text-center mb-3 table-animate">Liste des apprenants</h3>
+      <div class="d-flex flex-wrap justify-content-center gap-2 mb-2">
+        <a href="{% url 'learners_export_csv' %}" class="btn btn-outline-success btn-sm btn-animated"><i class="fas fa-file-csv me-1"></i>CSV</a>
+        <a href="{% url 'learners_export_pdf' %}" class="btn btn-outline-primary btn-sm btn-animated"><i class="fas fa-file-pdf me-1"></i>PDF</a>
+        <a href="{% url 'learners_export_excel' %}" class="btn btn-outline-warning btn-sm btn-animated"><i class="fas fa-file-excel me-1"></i>Excel</a>
+        <button type="button" class="btn btn-outline-secondary btn-sm btn-animated" onclick="printLearnersTable()">
+          <i class="fas fa-print me-1"></i>Imprimer
+        </button>
+      </div>
+
+      <!-- Début de la zone imprimable -->
+      <div id="printable-learners-table">
+        <div class="table-responsive" style="overflow-x:auto;">
+          <table id="learners-table" class="table table-bordered table-striped table-hover text-center align-middle w-100 table-animate" style="font-size: 1rem; min-width: 1000px;">
+            <thead>
+              <tr style="vertical-align: middle;">
+                <th class="px-2 py-2 border" style="letter-spacing:1px; font-size:0.85rem;">ID Apprenant</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Nom complet</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Date d'enregistrement</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Sexe</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Téléphone</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Email</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Adresse</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Statut</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Formation souhaitée</th>
+                <th class="px-2 py-2 border" style="font-size:0.85rem;">Observation</th>
+                <th class="px-2 py-2 border actions-col" style="font-size:0.85rem;">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for learner in learners %}
+              <tr
+                data-nom="{{ learner.full_name|default_if_none:''|lower }}"
+                data-phone="{{ learner.phone|default_if_none:''|lower }}"
+                data-statut="{{ learner.statut|default_if_none:''|lower }}"
+                data-observation="{{ learner.observation|default_if_none:''|lower }}"
+              >
+                <td class="border">{{ learner.student_id }}</td>
+                <td class="border">{{ learner.full_name }}</td>
+                <td class="border">{{ learner.registration_date|date:"d/m/Y H:i" }}</td>
+                <td class="border">{{ learner.get_gender_display }}</td>
+                <td class="border">{{ learner.phone }}</td>
+                <td class="border">{{ learner.email }}</td>
+                <td class="border">{{ learner.address }}</td>
+                <td class="border">{{ learner.statut }}</td>
+                <td class="border">{{ learner.desired_course }}</td>
+                <td class="border">{{ learner.observation }}</td>
+                <td class="border actions-col">
+                  <a href="#" class="btn btn-sm btn-warning mb-1 btn-animated edit-learner-btn" data-id="{{ learner.id }}" title="Modifier" aria-label="Modifier"><i class="fas fa-edit"></i></a>
+                  <a href="{% url 'learner_delete' learner.id %}" class="btn btn-sm btn-danger mb-1 btn-animated" title="Supprimer" aria-label="Supprimer"><i class="fas fa-trash-alt"></i></a>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="11">Aucun apprenant enregistré.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Fin de la zone imprimable -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal de modification d'apprenant (optionnel, pour AJAX) -->
+<div class="modal fade" id="editLearnerModal" tabindex="-1" aria-labelledby="editLearnerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <!-- PAS DE FOOTER ! -->
+      <div class="modal-header">
+        <h5 class="modal-title" id="editLearnerModalLabel">Modifier l'apprenant</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+      </div>
+      <div class="modal-body" id="edit-learner-fields-modal">
+        <!-- Le formulaire AJAX sera injecté ici (avec fond gris via bg-light) -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pied de page TEELAF -->
+<footer class="footer-teelaf mt-5 py-3 text-center text-white">
+    <div class="container">
+        <strong>TEELAF</strong><br>
+        Nous sommes une entreprise spécialisée dans la formation, le recrutement et l’intégration des solutions digitales.<br>
+        <span>Tél : <a href="tel:+224622586505" class="text-white">+224 622 586 505</a> / <a href="tel:+224611387787" class="text-white">611 387 787</a></span><br>
+        <a href="https://www.teelaf.com" class="text-white" target="_blank">www.teelaf.com</a><br>
+        <a href="mailto:contact@teelaf.com" class="text-white">contact@teelaf.com</a><br>
+        R. Guinée
+    </div>
+</footer>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- Bootstrap 5 requis pour la modal -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #printable-learners-table, #printable-learners-table * {
+    visibility: visible !important;
+  }
+  #printable-learners-table {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    background: #fff;
+    color: #000;
+    z-index: 9999;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
+  /* Masquer uniquement la colonne ID et Actions */
+  #learners-table th:nth-child(1),
+  #learners-table td:nth-child(1),
+  #learners-table th.actions-col,
+  #learners-table td.actions-col,
+  #learners-table th:last-child,
+  #learners-table td:last-child {
+    display: none !important;
+  }
+}
+</style>
+<script>
+// CSRF helper pour fetch
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function printLearnersTable() {
+  window.print();
+}
+
+// --- JS pour édition AJAX ---
+document.addEventListener('DOMContentLoaded', function() {
+  // Ouvre la modale et charge le formulaire d'édition via AJAX
+  document.querySelectorAll('.edit-learner-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var learnerId = this.getAttribute('data-id');
+      fetch(`/learners/edit/${learnerId}/?ajax=1`)
+        .then(response => response.text())
+        .then(html => {
+          document.getElementById('edit-learner-fields-modal').innerHTML = html;
+          var modal = new bootstrap.Modal(document.getElementById('editLearnerModal'));
+          modal.show();
+
+          // Attacher le submit handler sur le formulaire injecté
+          document.getElementById('edit-learner-manual-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var form = e.target;
+            var formData = new FormData(form);
+            fetch(`/learners/edit/${learnerId}/?ajax=1`, {
+              method: 'POST',
+              body: formData,
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken')
+              }
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                location.reload();
+              } else {
+                document.getElementById('edit-learner-fields-modal').innerHTML = data.form_html;
+              }
+            });
+          });
+        });
+    });
+  });
+
+  // --- JS de filtrage dynamique et récapitulatif ---
+  const filterName = document.getElementById('filter-name');
+  const filterPhone = document.getElementById('filter-phone');
+  const filterStatut = document.getElementById('filter-statut');
+  const filterObservation = document.getElementById('filter-observation');
+  const tbody = document.querySelector('#learners-table tbody');
+
+  // Normalisation robuste (minuscule, sans accent, sans espaces multiples)
+  function normalize(str) {
+    return (str || '')
+      .toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function filterTableAndRecap() {
+    const nameVal = normalize(filterName.value.trim());
+    const phoneVal = normalize(filterPhone.value.trim());
+    const statutVal = normalize(filterStatut.value.trim());
+    const obsVal = normalize(filterObservation.value.trim());
+
+    let total = 0, etudiants = 0, entrepreneurs = 0, professionnels = 0, chomage = 0, oui = 0, non = 0;
+
+    tbody.querySelectorAll('tr').forEach(row => {
+      // Ignore la ligne "Aucun apprenant enregistré"
+      if (row.children.length < 2) return;
+
+      const nom = normalize(row.getAttribute('data-nom'));
+      const phone = normalize(row.getAttribute('data-phone'));
+      const statut = normalize(row.getAttribute('data-statut'));
+      const observation = normalize(row.getAttribute('data-observation'));
+
+      const match =
+        (nameVal === '' || nom.includes(nameVal)) &&
+        (phoneVal === '' || phone.includes(phoneVal)) &&
+        (statutVal === '' || statut.includes(statutVal)) &&
+        (obsVal === '' || observation.includes(obsVal));
+
+      row.style.display = match ? '' : 'none';
+
+      if (match) {
+        total++;
+        // Comptage insensible à la casse et aux accents
+        if (statut === "etudiants _ eleves") etudiants++;
+        else if (statut === "entrepreneurs") entrepreneurs++;
+        else if (statut === "professionnels") professionnels++;
+        else if (statut === "sans emploi _ au chomage") chomage++;
+        if (observation === "oui") oui++;
+        if (observation === "non") non++;
+      }
+    });
+
+    document.getElementById('recap-total').textContent = total;
+    document.getElementById('recap-etudiants').textContent = etudiants;
+    document.getElementById('recap-entrepreneurs').textContent = entrepreneurs;
+    document.getElementById('recap-professionnels').textContent = professionnels;
+    document.getElementById('recap-chomage').textContent = chomage;
+    document.getElementById('recap-oui').textContent = oui;
+    document.getElementById('recap-non').textContent = non;
+  }
+
+  [filterName, filterPhone, filterStatut, filterObservation].forEach(input => {
+    input.addEventListener('input', filterTableAndRecap);
+  });
+});
+</script>
+{% endblock %}

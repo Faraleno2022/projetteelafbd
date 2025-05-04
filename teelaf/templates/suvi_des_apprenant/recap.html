@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Statistiques des Suivis d'Apprenants</h2>
+
+<!-- Graphique dynamique -->
+<canvas id="commentaireChart" width="400" height="200"></canvas>
+
+<!-- Tableau des statistiques -->
+<table class="table table-bordered mt-4">
+    <thead>
+        <tr>
+            <th>Commentaire</th>
+            <th>Nombre d'apprenants</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for stat in stats %}
+        <tr>
+            <td>{{ stat.Commentaire }}</td>
+            <td>{{ stat.total }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<a href="{% url 'suivi_list' %}" class="btn btn-primary">Retour à la liste</a>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const labels = [{% for stat in stats %}'{{ stat.Commentaire }}',{% endfor %}];
+    const data = [{% for stat in stats %}{{ stat.total }},{% endfor %}];
+    const ctx = document.getElementById('commentaireChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Nombre d\'apprenants',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+</script>
+{% endblock %}

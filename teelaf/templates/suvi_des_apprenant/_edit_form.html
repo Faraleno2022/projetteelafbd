@@ -1,0 +1,14 @@
+<form id="edit-suivi-form" method="post" action="{% url 'suivi_edit' suivi.pk %}">
+    {% csrf_token %}
+    <div class="modal-header">
+        <h5 class="modal-title">Modifier le suivi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+    </div>
+    <div class="modal-body">
+        {{ form.as_p }}
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+    </div>
+</form>

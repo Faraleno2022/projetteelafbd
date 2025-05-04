@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h3 class="mb-4 text-danger">Supprimer la dépense</h3>
+            <p>
+                Voulez-vous vraiment supprimer cette dépense&nbsp;?<br>
+                <strong>Description&nbsp;:</strong> {{ depense.description }}<br>
+                <strong>Date&nbsp;:</strong> {{ depense.date|date:"d/m/Y" }}<br>
+                <strong>Type&nbsp;:</strong> {{ depense.type }}<br>
+                <strong>Montant&nbsp;:</strong> {{ depense.solde|default:0|intcomma }} GNF
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+                <a href="{% url 'depenses_main' %}" class="btn btn-secondary">Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

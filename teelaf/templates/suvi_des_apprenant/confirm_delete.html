@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Supprimer le suivi d'apprenant</h2>
+<p>Es-tu sûr de vouloir supprimer ce suivi ?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+    <a href="{% url 'suivi_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<style>
+    .form-bg {
+        background:rgb(78, 71, 3) !important;
+        border-radius: 12px;
+        padding: 2rem 1.5rem;
+        color: #fff;
+    }
+    .form-bg .form-label { color: #fff !important; }
+    .form-bg .form-control { background: #eaf6fa; }
+    .export-btns .btn { min-width: 110px; }
+    .table-responsive { margin-top: 1.5rem; }
+    .filters-row input { max-width: 140px; }
+    #clients-table th,
+    #clients-table td {
+        font-size: 0.92rem;
+        padding: 0.4rem 0.3rem;
+    }
+    /* Couleur de fond grise pour le tableau */
+    #clients-table, #clients-table th, #clients-table td {
+        background:rgba(70, 173, 95, 0.92) !important;
+        color: #222;
+    }
+    @media print {
+        body * { visibility: hidden !important; }
+        #clients-table-section, #clients-table-section * { visibility: visible !important; }
+        #clients-table-section { position: absolute; left: 0; top: 0; width: 100vw; }
+        @page { size: landscape; }
+        #clients-table th:last-child,
+        #clients-table td:last-child {
+            display: none !important;
+        }
+        .footer-teelaf { display: none !important; }
+    }
+</style>
+
+<div class="container-fluid px-2 px-md-5 py-3">
+  <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+    <a href="{% url 'manage_clients_individuels' %}" class="btn btn-primary btn-lg">
+      <i class="fas fa-user"></i> Clients Individuels
+    </a>
+    <a href="{% url 'manage_clients_entreprises' %}" class="btn btn-success btn-lg">
+      <i class="fas fa-building"></i> Clients Entreprises
+    </a>
+    <a href="{% url 'manage_clients_prospects' %}" class="btn btn-warning btn-lg">
+      <i class="fas fa-user-plus"></i> Clients Prospects
+    </a>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+
+      <h2 class="text-center mb-4 fw-bold" style="letter-spacing:1px; color:#1d4d8e;">
+        GESTION DES PROSPECTS
+      </h2>
+
+      <div class="card mb-4">
+        <div class="card-header text-center" style="background: #1d4d8e; color: #fff;">
+            Ajouter un prospect
+        </div>
+        <div class="card-body form-bg">
+          {% if form.errors %}
+            <div class="alert alert-danger mt-2">
+              {{ form.errors }}
+            </div>
+          {% endif %}
+          {% crispy form %}
+        </div>
+      </div>
+
+      <div class="export-btns d-flex flex-wrap justify-content-center gap-2 mb-3">
+        <a href="{% url 'clients_prospects_export_csv' %}" class="btn btn-outline-success btn-sm">
+          <i class="fas fa-file-csv me-1"></i>CSV
+        </a>
+        <a href="{% url 'clients_prospects_export_excel' %}" class="btn btn-outline-warning btn-sm">
+          <i class="fas fa-file-excel me-1"></i>Excel
+        </a>
+        <button onclick="printTable()" class="btn btn-outline-danger btn-sm">
+          <i class="fas fa-file-pdf me-1"></i>PDF
+        </button>
+        <form action="{% url 'clients_prospects_import' %}" method="post" enctype="multipart/form-data" class="d-inline-block ms-2">
+          {% csrf_token %}
+          <label class="btn btn-outline-primary btn-sm mb-0">
+            <i class="fas fa-file-import me-1"></i>Importer
+            <input type="file" name="import_file" accept=".csv" onchange="this.form.submit()" hidden>
+          </label>
+        </form>
+      </div>
+
+      <div class="table-responsive" id="clients-table-section">
+        <table class="table table-bordered table-hover align-middle text-center" id="clients-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Contact</th>
+              <th>Email</th>
+              <th>Point focal</th>
+              <th>Déjà contact</th>
+              <th>Date dernier contact</th>
+              <th>Commentaire</th>
+              <th>Actions</th>
+            </tr>
+            <tr class="filters-row">
+              {% for i in "0123456" %}
+              <th><input type="text" class="form-control form-control-sm" placeholder="Filtrer..." onkeyup="filterTable({{ forloop.counter0 }}, this.value)"></th>
+              {% endfor %}
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for prospect in prospects %}
+            <tr>
+              <td>{{ prospect.prenoms_nom }}</td>
+              <td>{{ prospect.contact }}</td>
+              <td>{{ prospect.email }}</td>
+              <td>{{ prospect.point_focal }}</td>
+              <td>
+                {% if prospect.deja_contact %}
+                  Oui
+                {% else %}
+                  Non
+                {% endif %}
+              </td>
+              <td>{{ prospect.date_dernier_contact }}</td>
+              <td>{{ prospect.commentaire }}</td>
+              <td>
+                <a href="{% url 'client_prospect_edit' prospect.pk %}" class="btn btn-sm btn-warning mb-1" title="Modifier">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a href="{% url 'client_prospect_delete' prospect.pk %}" class="btn btn-sm btn-danger mb-1 confirm-suppression" title="Supprimer">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8">Aucun prospect enregistré.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+function filterTable(col, value) {
+  value = value.toLowerCase();
+  let rows = document.querySelectorAll("#clients-table tbody tr");
+  rows.forEach(row => {
+    let cell = row.children[col];
+    if (cell && cell.textContent.toLowerCase().includes(value)) {
+      row.style.display = "";
+    } else if (cell) {
+      row.style.display = "none";
+    }
+  });
+}
+function printTable() {
+  window.print();
+}
+// Confirmation suppression
+document.addEventListener("DOMContentLoaded", function() {
+  document.querySelectorAll('.confirm-suppression').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      if(!confirm("Voulez-vous vraiment supprimer ce prospect ?")) {
+        e.preventDefault();
+      }
+    });
+  });
+});
+</script>
+
+<footer class="footer-teelaf mt-5 py-3 text-center text-white" style="background: #000;">
+    <div class="container">
+        <strong>TEELAF</strong><br>
+        Nous sommes une entreprise spécialisée dans la formation, le recrutement et l’intégration des solutions digitales.<br>
+        <span>Tél : <a href="tel:+224622586505" class="text-white">+224 622 586 505</a> / <a href="tel:+224611387787" class="text-white">611 387 787</a></span><br>
+        <a href="https://www.teelaf.com" class="text-white" target="_blank">www.teelaf.com</a><br>
+        <a href="mailto:contact@teelaf.com" class="text-white">contact@teelaf.com</a><br>
+        R. Guinée
+    </div>
+</footer>
+
+{% endblock %}

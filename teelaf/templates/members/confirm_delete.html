@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <div class="alert alert-danger text-center">
+    <h4>Confirmer la suppression</h4>
+    <p>Êtes-vous sûr de vouloir supprimer le membre <strong>{{ member.nom }}</strong> ?</p>
+    <form method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+      <a href="{% url 'register_member' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

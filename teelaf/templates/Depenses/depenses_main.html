@@ -1,0 +1,524 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+
+{% block content %}
+
+<!-- Bootstrap Icons pour les actions -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css"/>
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css"/>
+
+<style>
+.form-bg {
+    background: #1d4d8e !important;
+    border-radius: 12px;
+    padding: 2rem 1.5rem;
+    color: #fff;
+}
+.totaux-block {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem 0.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+}
+.totaux-titres {
+    font-weight: bold;
+    color: #1d4d8e;
+    margin-bottom: 0.3rem;
+}
+.totaux-row-titres .col {
+    font-weight: bold;
+    color: #1d4d8e;
+    font-size: 1rem;
+}
+.totaux-row-montants .col {
+    font-size: 1.1rem;
+    color: #222;
+}
+.table-sm-custom th, .table-sm-custom td {
+    font-size: 0.92rem !important;
+    padding: 0.35rem 0.3rem !important;
+}
+.table-header-sm th {
+    font-size: 0.98rem !important;
+    font-weight: 500;
+}
+/* Footer style TEELAF centré */
+.footer-teelaf {
+    background: #111;
+    color: #fff;
+    border-top: 1px solid #222;
+    font-size: 0.98rem;
+}
+.footer-teelaf a {
+    color: #ffc107;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+.footer-teelaf a:hover {
+    color: #0dcaf0;
+    text-decoration: none;
+}
+/* NAVIGATION MODERNE ET ANIMÉE, 2 COULEURS DISTINCTES */
+.btn-group.nav-switch .btn-nav {
+    font-weight: 600;
+    font-size: 1.15rem;
+    letter-spacing: 0.01em;
+    transition: 
+        background 0.3s cubic-bezier(.4,2,.6,1), 
+        color 0.3s cubic-bezier(.4,2,.6,1), 
+        box-shadow 0.25s, 
+        border 0.3s, 
+        transform 0.2s;
+    box-shadow: none;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    border-width: 2px;
+}
+.btn-group.nav-switch #btn-depenses {
+    background: linear-gradient(90deg, #e3f0ff 60%, #b6d0fa 100%);
+    color: #1d4d8e;
+    border-color: #1d4d8e;
+}
+.btn-group.nav-switch #btn-formations {
+    background: linear-gradient(90deg, #fff3e0 60%, #ffd180 100%);
+    color: #b85b00;
+    border-color: #b85b00;
+}
+.btn-group.nav-switch #btn-depenses.active, 
+.btn-group.nav-switch #btn-depenses:focus {
+    background: linear-gradient(90deg, #1d4d8e 60%, #0dcaf0 100%);
+    color: #fff;
+    border-color: #0dcaf0;
+    box-shadow: 0 4px 16px 0 rgba(13,202,240,0.19), 0 0 16px #0dcaf0;
+    transform: scale(1.05);
+}
+.btn-group.nav-switch #btn-formations.active, 
+.btn-group.nav-switch #btn-formations:focus {
+    background: linear-gradient(90deg, #ff9800 60%, #ffd180 100%);
+    color: #fff;
+    border-color: #ff9800;
+    box-shadow: 0 4px 16px 0 rgba(255,152,0,0.19), 0 0 16px #ff9800;
+    transform: scale(1.05);
+}
+.btn-group.nav-switch #btn-depenses:not(.active):hover {
+    background: linear-gradient(90deg, #d6eaff 70%, #c2e9fb 100%);
+    color: #0dcaf0;
+    border-color: #0dcaf0;
+    transform: translateY(-2px) scale(1.02);
+}
+.btn-group.nav-switch #btn-formations:not(.active):hover {
+    background: linear-gradient(90deg, #ffe0b2 70%, #ffe9c7 100%);
+    color: #ff9800;
+    border-color: #ff9800;
+    transform: translateY(-2px) scale(1.02);
+}
+.btn-group.nav-switch .btn-nav .nav-icon {
+    display: inline-block;
+    margin-right: 0.7em;
+    font-size: 1.3em;
+    transition: transform 0.4s cubic-bezier(.4,2,.6,1);
+    vertical-align: middle;
+}
+.btn-group.nav-switch .btn-nav.active .nav-icon {
+    transform: rotate(-12deg) scale(1.2);
+    filter: drop-shadow(0 0 6px #0dcaf0);
+}
+.btn-group.nav-switch #btn-formations.active .nav-icon {
+    filter: drop-shadow(0 0 6px #ff9800);
+}
+.btn-group.nav-switch .btn-nav .nav-label {
+    vertical-align: middle;
+}
+@media (max-width: 600px) {
+    .btn-group.nav-switch .btn-nav {
+        font-size: 1rem;
+        padding: 0.7em 0.7em;
+    }
+    .btn-group.nav-switch .btn-nav .nav-icon {
+        font-size: 1.1em;
+        margin-right: 0.4em;
+    }
+}
+/* Filtre custom */
+#zone-filtre-depenses .form-control, #zone-filtre-depenses .form-select,
+#zone-filtre-formations .form-control, #zone-filtre-formations .form-select {
+    border-radius: 20px;
+    border: 1.5px solid #1d4d8e;
+    font-size: 0.97rem;
+}
+#zone-filtre-depenses, #zone-filtre-formations {
+    background: #f6fbff;
+    border-radius: 12px;
+    padding: 0.7em 0.5em 0.2em 0.5em;
+    margin-bottom: 0.8em;
+    box-shadow: 0 2px 8px rgba(13,202,240,0.06);
+}
+</style>
+
+<div class="container-fluid px-2 px-md-5 py-3">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+
+      <!-- NAVIGATION MODERNE ET ANIMÉE ENTRE DÉPENSES ET FORMATIONS -->
+      <div class="d-flex justify-content-center my-4">
+        <div class="btn-group btn-group-lg nav-switch" role="group" aria-label="Navigation Dépenses/Formations">
+          <button type="button" class="btn btn-nav active" id="btn-depenses">
+            <span class="nav-icon"><i class="bi bi-cash-coin"></i></span>
+            <span class="nav-label">Gestion des dépenses</span>
+          </button>
+          <button type="button" class="btn btn-nav" id="btn-formations">
+            <span class="nav-icon"><i class="bi bi-mortarboard-fill"></i></span>
+            <span class="nav-label">Frais de formation</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section Gestion des Dépenses -->
+      <div id="section-depenses">
+        <h3 class="text-center mb-3">Gestion des dépenses</h3>
+        <div class="card mb-3">
+            <div class="card-header text-center">Ajouter une dépense</div>
+            <div class="card-body form-bg">
+                <form method="post" id="form-depense">
+                    {% csrf_token %}
+                    {% crispy depense_form %}
+                </form>
+            </div>
+        </div>
+        <div class="mb-3">
+            <h5 class="text-center">Liste des dépenses</h5>
+            <!-- ZONE DE FILTRE -->
+            <div class="row mb-3" id="zone-filtre-depenses">
+                <div class="col-md-3 mb-2">
+                    <input type="text" id="filtre-description" class="form-control" placeholder="Filtrer par description...">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <select id="filtre-type" class="form-select">
+                        <option value="">Tous les types</option>
+                        {% for key, val in depenses.0.TYPE_CHOICES %}
+                        <option value="{{ val }}">{{ val }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3 mb-2">
+                    <input type="date" id="filtre-date-min" class="form-control" placeholder="Date min">
+                </div>
+                <div class="col-md-3 mb-2">
+                    <input type="date" id="filtre-date-max" class="form-control" placeholder="Date max">
+                </div>
+            </div>
+            <div class="totaux-block mb-3">
+                <div class="totaux-titres text-center">Totaux visibles</div>
+                <div class="row totaux-row-titres text-center">
+                    <div class="col">Dépenses</div>
+                    <div class="col">Recette</div>
+                    <div class="col">Formation</div>
+                    <div class="col">Autre</div>
+                </div>
+                <div class="row totaux-row-montants text-center">
+                    <div class="col"><div class="totaux-val" id="total-depense">{{ total_depense|floatformat:2|intcomma }} GNF</div></div>
+                    <div class="col"><div class="totaux-val" id="total-recette">{{ total_recette|floatformat:2|intcomma }} GNF</div></div>
+                    <div class="col"><div class="totaux-val" id="total-formation">{{ total_formation|floatformat:2|intcomma }} GNF</div></div>
+                    <div class="col"><div class="totaux-val" id="total-autre">{{ total_autre|floatformat:2|intcomma }} GNF</div></div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="table-depenses" class="table table-striped table-bordered align-middle text-center w-100 table-sm-custom table-header-sm">
+                    <thead>
+                        <tr>
+                            <th style="width: 18%;">Date</th>
+                            <th style="width: 32%;">Description</th>
+                            <th style="width: 20%;">Type</th>
+                            <th style="width: 15%;">Solde</th>
+                            <th style="width: 10%;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for depense in depenses %}
+                        <tr>
+                            <td>{{ depense.date }}</td>
+                            <td>{{ depense.description }}</td>
+                            <td>{{ depense.get_type_display }}</td>
+                            <td>{{ depense.solde|floatformat:0|intcomma }} GNF</td>
+                            <td>
+                                <a href="{% url 'modifier_depense' depense.id %}" class="text-primary me-2" title="Modifier">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'supprimer_depense' depense.id %}" class="text-danger confirm-suppression" title="Supprimer">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      </div>
+
+      <!-- Section Frais de Formation -->
+      <div id="section-formations" style="display:none;">
+        <h3 class="text-center mb-3">Frais de formation</h3>
+        <div class="card mb-3">
+            <div class="card-header text-center">Ajouter une formation</div>
+            <div class="card-body form-bg">
+                <form method="post" id="form-formation">
+                    {% csrf_token %}
+                    {% crispy formation_form %}
+                </form>
+            </div>
+        </div>
+        <div class="mb-3">
+            <h5 class="text-center">Liste des frais de formation</h5>
+            <!-- BOUTONS DE FILTRE AUTOMATIQUE -->
+            <div class="mb-2 d-flex flex-wrap gap-2 justify-content-center" id="auto-filter-buttons-formations">
+                <button class="btn btn-outline-secondary btn-sm active" data-type="">Tous</button>
+                <button class="btn btn-outline-primary btn-sm" data-type="Inscription">Inscription</button>
+                <button class="btn btn-outline-success btn-sm" data-type="Avance">Avance payée</button>
+                <button class="btn btn-outline-warning btn-sm" data-type="Reste">Reste à payer</button>
+                <button class="btn btn-outline-dark btn-sm" data-type="Clôturé">Clôturé</button>
+            </div>
+            <!-- ZONE DE FILTRE FORMATIONS -->
+            <div class="row mb-3" id="zone-filtre-formations">
+                <div class="col-md-4 mb-2">
+                    <input type="text" id="filtre-nom-formation" class="form-control" placeholder="Filtrer par nom...">
+                </div>
+                <div class="col-md-4 mb-2">
+                    <input type="text" id="filtre-formation" class="form-control" placeholder="Filtrer par formation...">
+                </div>
+                <div class="col-md-4 mb-2">
+                    <input type="date" id="filtre-date-inscription" class="form-control" placeholder="Date d'inscription">
+                </div>
+            </div>
+            <div class="totaux-block mb-3">
+                <div class="totaux-titres text-center">Totaux visibles</div>
+                <div class="row totaux-row-titres text-center">
+                    <div class="col">Frais de formation</div>
+                    <div class="col">Inscription</div>
+                    <div class="col">Avance payée</div>
+                    <div class="col">Reste à payer</div>
+                </div>
+                <div class="row totaux-row-montants text-center">
+                    <div class="col"><div class="totaux-val" id="total-frais">{{ total_frais_formation|floatformat:2|intcomma }} GNF</div></div>
+                    <div class="col"><div class="totaux-val" id="total-inscription">{{ total_inscription|floatformat:2|intcomma }} GNF</div></div>
+                    <div class="col"><div class="totaux-val" id="total-avance">{{ total_avance|floatformat:2|intcomma }} GNF</div></div>
+                    <div class="col"><div class="totaux-val" id="total-reste">{{ total_reste|floatformat:2|intcomma }} GNF</div></div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="table-formations" class="table table-striped table-bordered align-middle text-center w-100 table-sm-custom table-header-sm">
+                    <thead>
+                        <tr>
+                            <th>Prénom et Nom</th>
+                            <th>Date d'inscription</th>
+                            <th>Formation suivie</th>
+                            <th>Frais de formation</th>
+                            <th>Inscription</th>
+                            <th>Avance payée</th>
+                            <th>Date de fin</th>
+                            <th>Reste à payer</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for formation in formations %}
+                        <tr>
+                            <td>{{ formation.prenom_nom }}</td>
+                            <td>{{ formation.date_inscription }}</td>
+                            <td>{{ formation.formation_suivie }}</td>
+                            <td class="montant-frais">{{ formation.frais_formation|floatformat:0|default:"0"|intcomma }}</td>
+                            <td class="montant-inscription">{{ formation.inscription|floatformat:0|default:"0"|intcomma }}</td>
+                            <td class="montant-avance">{{ formation.avance_payer|floatformat:0|default:"0"|intcomma }}</td>
+                            <td>{{ formation.date_fin }}</td>
+                            <td class="montant-reste">
+                                {{ formation.reste_a_payer|floatformat:0|intcomma }} GNF
+                            </td>
+                            <td>
+                              {% if formation.reste_a_payer <= 0 %}
+                                <span class="text-success fw-bold">Clôturé</span>
+                              {% else %}
+                                <span class="text-danger fw-bold">Reste</span>
+                              {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'modifier_formation' formation.id %}" class="text-primary me-2" title="Modifier">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{% url 'supprimer_formation' formation.id %}" class="text-danger confirm-suppression" title="Supprimer">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+<!-- DataTables Buttons -->
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+<!-- JSZip et pdfmake pour l’export Excel/PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Ton JS custom, tout à la fin -->
+<script src="{% static 'js/depenses_main.js' %}"></script>
+
+<script>
+$(document).ready(function() {
+    // Dépenses DataTable
+    var table = $('#table-depenses').DataTable({
+        language: { url: "//cdn.datatables.net/plug-ins/1.13.5/i18n/fr-FR.json" },
+        dom: 'Bfrtip',
+        buttons: ['csv', 'excel', 'pdf', 'colvis'],
+        order: [[0, 'desc']],
+        initComplete: function() {
+            calcTotauxVisibles();
+        }
+    });
+
+    // Filtre description
+    $('#filtre-description').on('keyup change', function() {
+        table.column(1).search(this.value).draw();
+    });
+    // Filtre type
+    $('#filtre-type').on('change', function() {
+        table.column(2).search(this.value).draw();
+    });
+    // Filtre date min/max
+    $.fn.dataTable.ext.search.push(
+        function(settings, data, dataIndex) {
+            if(settings.nTable.id !== 'table-depenses') return true;
+            var dateMin = $('#filtre-date-min').val();
+            var dateMax = $('#filtre-date-max').val();
+            var date = data[0];
+            if(dateMin && date < dateMin) return false;
+            if(dateMax && date > dateMax) return false;
+            return true;
+        }
+    );
+    $('#filtre-date-min, #filtre-date-max').on('change', function() {
+        table.draw();
+    });
+    // Recalcul des totaux visibles après chaque filtre
+    table.on('draw', function() {
+        calcTotauxVisibles();
+    });
+    function calcTotauxVisibles() {
+        var totalDepense = 0, totalRecette = 0, totalFormation = 0, totalAutre = 0;
+        table.rows({search:'applied'}).every(function() {
+            var data = this.data();
+            var type = data[2];
+            var montant = parseFloat(data[3].replace(/[^0-9.-]+/g,"")) || 0;
+            if(type.includes('Dépense')) totalDepense += montant;
+            else if(type.includes('Recette')) totalRecette += montant;
+            else if(type.includes('Formation')) totalFormation += montant;
+            else totalAutre += montant;
+        });
+        $('#total-depense').text(totalDepense.toLocaleString() + ' GNF');
+        $('#total-recette').text(totalRecette.toLocaleString() + ' GNF');
+        $('#total-formation').text(totalFormation.toLocaleString() + ' GNF');
+        $('#total-autre').text(totalAutre.toLocaleString() + ' GNF');
+    }
+
+    // Formations DataTable
+    var tableFormations = $('#table-formations').DataTable({
+        language: { url: "//cdn.datatables.net/plug-ins/1.13.5/i18n/fr-FR.json" },
+        dom: 'Bfrtip',
+        buttons: ['csv', 'excel', 'pdf', 'colvis'],
+        order: [[1, 'desc']],
+        initComplete: function() {
+            calcTotauxVisiblesFormations();
+        }
+    });
+    // Filtres formations
+    $('#filtre-nom-formation').on('keyup change', function() {
+        tableFormations.column(0).search(this.value).draw();
+    });
+    $('#filtre-formation').on('keyup change', function() {
+        tableFormations.column(2).search(this.value).draw();
+    });
+    $('#filtre-date-inscription').on('change', function() {
+        tableFormations.column(1).search(this.value).draw();
+    });
+    // Boutons de filtre automatique formations
+    $('#auto-filter-buttons-formations button').on('click', function() {
+        $('#auto-filter-buttons-formations button').removeClass('active');
+        $(this).addClass('active');
+        var type = $(this).data('type');
+        if(type === "") {
+            tableFormations.column(8).search('').draw();
+        } else {
+            tableFormations.column(8).search(type).draw();
+        }
+    });
+    // Recalcul des totaux visibles formations
+    tableFormations.on('draw', function() {
+        calcTotauxVisiblesFormations();
+    });
+    function calcTotauxVisiblesFormations() {
+        var totalFrais = 0, totalInscription = 0, totalAvance = 0, totalReste = 0;
+        tableFormations.rows({search:'applied'}).every(function() {
+            var data = this.data();
+            totalFrais += parseFloat(data[3].replace(/[^0-9.-]+/g,"")) || 0;
+            totalInscription += parseFloat(data[4].replace(/[^0-9.-]+/g,"")) || 0;
+            totalAvance += parseFloat(data[5].replace(/[^0-9.-]+/g,"")) || 0;
+            totalReste += parseFloat(data[7].replace(/[^0-9.-]+/g,"")) || 0;
+        });
+        $('#total-frais').text(totalFrais.toLocaleString() + ' GNF');
+        $('#total-inscription').text(totalInscription.toLocaleString() + ' GNF');
+        $('#total-avance').text(totalAvance.toLocaleString() + ' GNF');
+        $('#total-reste').text(totalReste.toLocaleString() + ' GNF');
+    }
+
+    // Navigation entre sections
+    const btnDepenses = document.getElementById('btn-depenses');
+    const btnFormations = document.getElementById('btn-formations');
+    const sectionDepenses = document.getElementById('section-depenses');
+    const sectionFormations = document.getElementById('section-formations');
+    function activate(btnToActivate, btnToDeactivate, sectionShow, sectionHide) {
+        btnToActivate.classList.add('active');
+        btnToDeactivate.classList.remove('active');
+        sectionShow.style.display = 'block';
+        sectionHide.style.display = 'none';
+    }
+    btnDepenses.addEventListener('click', function() {
+        activate(btnDepenses, btnFormations, sectionDepenses, sectionFormations);
+    });
+    btnFormations.addEventListener('click', function() {
+        activate(btnFormations, btnDepenses, sectionFormations, sectionDepenses);
+    });
+});
+</script>
+
+<!-- Pied de page TEELAF -->
+<footer class="footer-teelaf mt-5 py-3 text-center text-white">
+    <div class="container">
+        <strong>TEELAF</strong><br>
+        Nous sommes une entreprise spécialisée dans la formation, le recrutement et l’intégration des solutions digitales.<br>
+        <span>Tél : <a href="tel:+224622586505" class="text-warning text-decoration-underline">+224 622 586 505</a> / <a href="tel:+224611387787" class="text-warning text-decoration-underline">611 387 787</a></span><br>
+        <a href="https://www.teelaf.com" class="text-warning text-decoration-underline" target="_blank">www.teelaf.com</a><br>
+        <a href="mailto:contact@teelaf.com" class="text-warning text-decoration-underline">contact@teelaf.com</a><br>
+        R. Guinée
+    </div>
+</footer>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Gérer les accès de {{ target_user.username }}</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {% for fenetre in all_fenetres %}
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="fenetres" value="{{ fenetre.id }}"
+                        id="fenetre{{ fenetre.id }}"
+                        {% if fenetre in user_fenetres %}checked{% endif %}>
+                    <label class="form-check-label" for="fenetre{{ fenetre.id }}">
+                        {{ fenetre.name }}
+                    </label>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer les accès</button>
+    </form>
+    <a href="{% url 'user_detail' user_id=target_user.id %}" class="btn btn-secondary mt-3">Retour</a>
+</div>
+{% endblock %}

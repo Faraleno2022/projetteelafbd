@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow">
+        <div class="card-body">
+            <h3 class="mb-4 text-danger">Supprimer la formation</h3>
+            <p>
+                Voulez-vous vraiment supprimer cette formation&nbsp;?<br>
+                <strong>Nom du participant&nbsp;:</strong> {{ formation.prenom_nom }}<br>
+                <strong>Formation suivie&nbsp;:</strong> {{ formation.formation_suivie }}<br>
+                <strong>Date d'inscription&nbsp;:</strong> {{ formation.date_inscription|date:"d/m/Y" }}<br>
+                <strong>Montant payé&nbsp;:</strong> {{ formation.avance_payer|default:0|intcomma }} GNF
+            </p>
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">Oui, supprimer</button>
+                <a href="{% url 'depenses_main' %}" class="btn btn-secondary">Annuler</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,31 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
+    <h1 class="display-5 fw-bold text-primary text-center mb-4">Bienvenue sur le Dashboard <span class="text-success">TEELAF</span></h1>
+    {% if is_admin %}
+        <h2 class="h4 text-center mb-4">Gestion des accès (Admin)</h2>
+        <ul class="list-unstyled text-center">
+            {% for fenetre in fenetres %}
+                <li class="mb-2">
+                    <a href="{{ fenetre.url }}">{{ fenetre.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'admin:index' %}" class="btn btn-primary mt-3">
+            Gérer les utilisateurs et les accès
+        </a>
+    {% else %}
+        <h2 class="h4 text-center mb-4">Vos accès</h2>
+        <ul class="list-unstyled text-center">
+            {% for fenetre in fenetres %}
+                <li class="mb-2">
+                    <a href="{{ fenetre.url }}">{{ fenetre.name }}</a>
+                </li>
+            {% empty %}
+                <li class="text-muted">Aucun accès attribué.</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+{% endblock %}

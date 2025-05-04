@@ -1,0 +1,4 @@
+{% load crispy_forms_tags %}
+{% csrf_token %}
+<input type="hidden" name="id" value="{{ form.instance.id }}">
+{% crispy form 'bootstrap5' %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+      <div class="form-bg p-4 rounded shadow-sm bg-primary">
+        <h2 class="text-center mb-4 text-white">Enregistrement Membre</h2>
+        <form method="post" class="form-container">
+          {% csrf_token %}
+          {{ form|crispy }}
+          <div class="form-footer text-center mt-3">
+            <button type="submit" class="btn btn-primary px-4 btn-animated">
+              <i class="fas fa-save me-2"></i>Enregistrer
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des membres -->
+  <div class="mt-5">
+    <h3 class="text-center mb-3 table-animate">Liste des membres</h3>
+    <div class="table-responsive">
+      <table class="table table-bordered table-striped table-hover align-middle table-animate">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Email</th>
+            <th scope="col">Téléphone</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for member in members %}
+          <tr>
+            <td>{{ member.id }}</td>
+            <td>{{ member.first_name }} {{ member.last_name }}</td>
+            <td>{{ member.email }}</td>
+            <td>{{ member.phone }}</td>
+            <td>
+              <a href="{% url 'member_edit' member.id %}" class="btn btn-sm btn-warning mb-1 btn-animated" title="Modifier"><i class="fas fa-edit"></i></a>
+              <a href="{% url 'member_delete' member.id %}" class="btn btn-sm btn-danger mb-1 btn-animated" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5">Aucun membre enregistré.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

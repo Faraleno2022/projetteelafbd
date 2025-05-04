@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow mx-auto" style="max-width: 500px;">
+        <div class="card-body">
+            <h2 class="mb-4 text-center">Mon profil</h2>
+            <p><strong>Nom d'utilisateur :</strong> {{ user.username }}</p>
+            <p><strong>Email :</strong> {{ user.email }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,290 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<style>
+  .form-container .form-control,
+  .form-container select.form-control,
+  .form-container textarea.form-control {
+      height: 42px;
+      min-height: 42px;
+      max-height: 42px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 1rem;
+  }
+  .form-container textarea.form-control {
+      height: auto;
+      min-height: 42px;
+  }
+  .form-container label {
+      font-weight: 500;
+  }
+</style>
+
+<div class="container-fluid px-2 px-md-5 py-3">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-10">
+      <div class="marquee-container mb-4">
+        <h2 class="marquee-text text-center">FORMULAIRE D'AJOUT DE SUIVI</h2>
+      </div>
+      <div class="form-bg mb-4" style="background: #3f98b0; border-radius: 12px;">
+        <form method="post" novalidate class="form-container py-4 px-3" style="color: #fff;">
+          {% csrf_token %}
+          {{ form.non_field_errors }}
+          {{ form|crispy }}
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="nom_complet" class="form-label">Nom complet</label>
+              <input type="text" id="nom_complet" class="form-control" readonly>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="formation" class="form-label">Formation suivie</label>
+              <input type="text" id="formation" class="form-control" readonly>
+            </div>
+          </div>
+          {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+          {% endfor %}
+          <div class="form-footer text-center mt-3">
+            <button type="submit" class="btn btn-primary px-4 btn-animated">
+              <i class="fas fa-save me-2"></i>Enregistrer
+            </button>
+          </div>
+        </form>
+        <script>
+          // Dictionnaire {id_apprenant: {nom_complet: "...", formation: "..."}}
+          const apprenants = {
+            {% for apprenant in apprenants %}
+              "{{ apprenant.id }}": {
+                nom_complet: "{{ apprenant.nom_complet|escapejs }}",
+                formation: "{{ apprenant.formation|escapejs }}"
+              },
+            {% endfor %}
+          };
+
+          document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById("id_ID_Apprenant");
+            const nomInput = document.getElementById("nom_complet");
+            const formationInput = document.getElementById("formation");
+
+            function updateFields() {
+              const selectedId = select ? select.value : null;
+              if (selectedId && apprenants[selectedId]) {
+                nomInput.value = apprenants[selectedId].nom_complet;
+                formationInput.value = apprenants[selectedId].formation;
+              } else {
+                nomInput.value = "";
+                formationInput.value = "";
+              }
+            }
+
+            if (select) {
+              select.addEventListener('change', updateFields);
+              updateFields();
+            }
+          });
+        </script>
+      </div>
+
+      <!-- Zone de filtres dynamiques stylisée -->
+      <div class="my-3 p-3 rounded-3 border d-flex flex-wrap align-items-center gap-3 justify-content-center"
+           id="filter-zone"
+           style="background-color: #f2f2f2;">
+        <div>
+          <label for="filter-nom" class="form-label mb-1">Nom complet</label>
+          <input type="text" id="filter-nom" class="form-control form-control-sm" placeholder="Filtrer par nom...">
+        </div>
+        <div>
+          <label for="filter-formation" class="form-label mb-1">Formation</label>
+          <input type="text" id="filter-formation" class="form-control form-control-sm" placeholder="Filtrer par formation...">
+        </div>
+        <div>
+          <label for="filter-date" class="form-label mb-1">Date début</label>
+          <input type="text" id="filter-date" class="form-control form-control-sm" placeholder="Filtrer par date...">
+        </div>
+        <div>
+          <label for="filter-commentaire" class="form-label mb-1">Commentaire</label>
+          <input type="text" id="filter-commentaire" class="form-control form-control-sm" placeholder="Filtrer par commentaire...">
+        </div>
+      </div>
+
+      <!-- Bloc export/import centré -->
+      <div class="mb-3 d-flex justify-content-center align-items-center gap-2 flex-wrap">
+        <a href="{% url 'suivi_export_csv' %}" class="btn btn-outline-success btn-sm btn-animated"><i class="fas fa-file-csv me-1"></i>CSV</a>
+        <a href="{% url 'suivi_export_excel' %}" class="btn btn-outline-warning btn-sm btn-animated"><i class="fas fa-file-excel me-1"></i>Excel</a>
+        <a href="{% url 'suivi_export_pdf' %}" class="btn btn-outline-primary btn-sm btn-animated"><i class="fas fa-file-pdf me-1"></i>PDF</a>
+        <form action="{% url 'suivi_import' %}" method="post" enctype="multipart/form-data" class="d-inline ms-2">
+          {% csrf_token %}
+          <input type="file" name="import_file" class="form-control-file d-inline" required>
+          <button type="submit" class="btn btn-info btn-sm btn-animated">Importer</button>
+        </form>
+      </div>
+
+      <!-- Tableau des suivis -->
+      <div class="card">
+        <style>
+          .table-responsive .table td,
+          .table-responsive .table th {
+            font-size: 0.85rem;
+          }
+        </style>
+        <div class="card-header">
+          <h5 class="text-center mb-0">Liste des Suivis d'Apprenants</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+            <table id="suivis-table" class="table table-bordered table-striped table-hover align-middle w-100 table-animate">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nom complet</th>
+                  <th>Date début</th>
+                  <th>Formation suivie</th>
+                  <th>Poste avant</th>
+                  <th>Dernier contact</th>
+                  <th>Date fin</th>
+                  <th>Poste après</th>
+                  <th>Commentaire</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for suivi in suivis %}
+                <tr>
+                  <td>{{ suivi.ID_Apprenant.id }}</td>
+                  <td>{{ suivi.ID_Apprenant.full_name }}</td>
+                  <td>{{ suivi.Date_debut }}</td>
+                  <td>{{ suivi.ID_Apprenant.desired_course }}</td>
+                  <td>{{ suivi.Poste_avant_teelaf }}</td>
+                  <td>{{ suivi.Dernier_contact }}</td>
+                  <td>{{ suivi.Date_fin }}</td>
+                  <td>{{ suivi.Poste_apres_teelaf }}</td>
+                  <td>{{ suivi.Commentaire }}</td>
+                  <td>
+                    <button type="button"
+                            class="btn btn-warning btn-sm btn-animated btn-edit-suivi"
+                            data-id="{{ suivi.pk }}"
+                            title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <a href="{% url 'suivi_delete' suivi.pk %}" class="btn btn-danger btn-sm btn-animated" title="Supprimer"><i class="fas fa-trash-alt"></i></a>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="10" class="text-center">Aucun suivi trouvé.</td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <a href="{% url 'suivi_recap' %}" class="btn btn-info mt-2">Voir les statistiques</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pour édition du suivi -->
+<div class="modal fade" id="editSuiviModal" tabindex="-1" aria-labelledby="editSuiviModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" id="edit-suivi-fields-modal">
+      <!-- Le formulaire AJAX sera injecté ici -->
+    </div>
+  </div>
+</div>
+
+<footer class="text-center mt-4 py-3"
+        style="background: #000; color: #fff; border-top: 1px solid #222; font-size: 0.95rem;">
+    <strong>TEELAF</strong> &ndash; Nous sommes une entreprise spécialisée dans la formation, le recrutement et l’intégration des solutions digitales.<br>
+    <span>Tél : <a href="tel:+224622586505" style="color:#fff;">+224 622 586 505</a> / <a href="tel:+224611387787" style="color:#fff;">611 387 787</a></span><br>
+    <a href="https://www.teelaf.com" target="_blank" style="color:#fff; text-decoration: underline;">www.teelaf.com</a>
+    &ndash;
+    <a href="mailto:contact@teelaf.com" style="color:#fff; text-decoration: underline;">contact@teelaf.com</a><br>
+    R. Guinée
+</footer>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function filterSuivisTable() {
+        var nom = document.getElementById('filter-nom').value.toLowerCase();
+        var formation = document.getElementById('filter-formation').value.toLowerCase();
+        var date = document.getElementById('filter-date').value.toLowerCase();
+        var commentaire = document.getElementById('filter-commentaire').value.toLowerCase();
+
+        var table = document.getElementById('suivis-table');
+        var rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        for (var i = 0; i < rows.length; i++) {
+            var tds = rows[i].getElementsByTagName('td');
+            if (tds.length < 10) continue;
+
+            // Nouvel ordre : ID, Nom complet, Date début, Formation suivie, Poste avant, Dernier contact, Date fin, Poste après, Commentaire, Actions
+            var valNom = tds[1].textContent.toLowerCase();
+            var valFormation = tds[3].textContent.toLowerCase();
+            var valDate = tds[2].textContent.toLowerCase();
+            var valCommentaire = tds[8].textContent.toLowerCase();
+
+            var show = true;
+            if (nom && !valNom.includes(nom)) show = false;
+            if (formation && !valFormation.includes(formation)) show = false;
+            if (date && !valDate.includes(date)) show = false;
+            if (commentaire && !valCommentaire.includes(commentaire)) show = false;
+
+            rows[i].style.display = show ? '' : 'none';
+        }
+    }
+
+    document.getElementById('filter-nom').addEventListener('input', filterSuivisTable);
+    document.getElementById('filter-formation').addEventListener('input', filterSuivisTable);
+    document.getElementById('filter-date').addEventListener('input', filterSuivisTable);
+    document.getElementById('filter-commentaire').addEventListener('input', filterSuivisTable);
+
+    // Confirmation pour la suppression
+    $(document).on('click', '.btn-danger', function(e) {
+        if (!confirm("Êtes-vous sûr de vouloir supprimer ce suivi ?")) {
+            e.preventDefault();
+        }
+    });
+});
+
+// Script AJAX pour édition en modal
+$(document).on('click', '.btn-edit-suivi', function() {
+    var suiviId = $(this).data('id');
+    // Correction ici : URL Django conforme à urls.py
+    $.ajax({
+        url: '/suivi_des_apprenants/modifier/' + suiviId + '/',
+        type: 'GET',
+        success: function(data) {
+            $('#edit-suivi-fields-modal').html(data.form_html);
+            var modal = new bootstrap.Modal(document.getElementById('editSuiviModal'));
+            modal.show();
+        }
+    });
+});
+
+$(document).on('submit', '#edit-suivi-form', function(e) {
+    e.preventDefault();
+    var form = $(this);
+    $.ajax({
+        url: form.attr('action'),
+        type: 'POST',
+        data: form.serialize(),
+        success: function(response) {
+            if (response.success) {
+                var modal = bootstrap.Modal.getInstance(document.getElementById('editSuiviModal'));
+                modal.hide();
+                let alert = $('<div class="alert alert-success text-center" role="alert">Modification enregistrée avec succès !</div>');
+                $('body').prepend(alert);
+                setTimeout(function(){ location.reload(); }, 1000);
+            } else {
+                $('#edit-suivi-fields-modal').html(response.form_html);
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

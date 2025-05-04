@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h2>Modifier l'inventaire</h2>
+<form method="post">
+    {% csrf_token %}
+    {% crispy form %}
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <a href="{% url 'suivi_projects_main' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

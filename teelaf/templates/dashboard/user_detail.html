@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Fiche de {{ target_user.username }}</h1>
+<ul class="list-group mb-3">
+    <li class="list-group-item"><strong>Email :</strong> {{ target_user.email }}</li>
+    <li class="list-group-item"><strong>Superutilisateur :</strong> {{ target_user.is_superuser|yesno:"Oui,Non" }}</li>
+    <li class="list-group-item"><strong>Actif :</strong> {{ target_user.is_active|yesno:"Oui,Non" }}</li>
+</ul>
+{% if is_admin %}
+    <a href="{% url 'admin_change_password' user_id=target_user.id %}" class="btn btn-warning btn-sm">
+        <i class="fa fa-key"></i> Modifier le mot de passe
+    </a>
+{% endif %}
+<a href="{% url 'user_list' %}" class="btn btn-secondary btn-sm ms-2">
+    <i class="fa fa-arrow-left"></i> Retour à la liste
+</a>
+{% endblock %}

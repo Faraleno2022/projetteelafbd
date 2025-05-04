@@ -1,0 +1,315 @@
+/* --- Fond gris UNIQUEMENT pour les pages d'ajout --- */
+body.page-ajouter {
+    background-color: #f8f9fa !important;
+}
+
+/* --- Formulaires fond bleu et texte blanc --- */
+.card.formulaire-bg, div.card.formulaire-bg {
+    background-color: #1d4d8e !important;
+    color: #fff !important;
+    border: none;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+body .card.formulaire-bg {
+    background-color: #1d4d8e !important;
+    color: #fff !important;
+    border: none !important;
+}
+.card-header.formulaire-header {
+    background: transparent;
+    color: #fff !important;
+    font-size: 1.75rem;
+    font-weight: bold;
+    border-bottom: none;
+    letter-spacing: 1px;
+    text-align: center;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+}
+/* Champs du formulaire dans la carte bleue */
+.card.formulaire-bg .form-control,
+.card.formulaire-bg label,
+.card.formulaire-bg .btn {
+    font-size: 1.1rem;
+}
+.card.formulaire-bg .form-control,
+.card.formulaire-bg .form-select,
+.card.formulaire-bg textarea {
+    color: #222 !important;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+}
+.card.formulaire-bg .form-control:focus,
+.card.formulaire-bg .form-select:focus,
+.card.formulaire-bg textarea:focus {
+    background-color: #fff;
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+/* Labels noirs dans le formulaire bleu */
+.formulaire-bg label,
+.formulaire-bg .form-label {
+    color: #000 !important;
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+}
+/* Placeholder gris standard */
+.card.formulaire-bg .form-control::placeholder {
+    color: #6c757d !important;
+    opacity: 1;
+}
+/* Boutons principaux dans le formulaire bleu */
+.card.formulaire-bg .btn-light {
+    background: #fff;
+    color: #1d4d8e;
+    border: 1.5px solid #1d4d8e;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    padding: 0.6rem 1rem;
+}
+.card.formulaire-bg .btn-light:hover,
+.card.formulaire-bg .btn-light:focus {
+    background: #eaf6ff;
+    color: #1d4d8e;
+    box-shadow: 0 2px 10px rgba(29,77,142,0.13);
+}
+.card.formulaire-bg .btn-outline-light {
+    background: transparent;
+    color: #fff;
+    border: 1.5px solid #fff;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+    padding: 0.6rem 1rem;
+}
+.card.formulaire-bg .btn-outline-light:hover,
+.card.formulaire-bg .btn-outline-light:focus {
+    background: #fff;
+    color: #1d4d8e;
+}
+.card.formulaire-bg .btn-outline-warning {
+    border: 1.5px solid #ffc107;
+    color: #ffc107;
+    background: transparent;
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+}
+.card.formulaire-bg .btn-outline-warning:hover {
+    background: #ffc107;
+    color: #1d4d8e;
+}
+/* Messages d'erreur dans le formulaire bleu */
+.card.formulaire-bg .errorlist li,
+.card.formulaire-bg .alert-danger,
+.card.formulaire-bg .invalid-feedback {
+    color: #f8d7da !important;
+    background-color: #842029;
+    border-color: #f5c2c7;
+    padding: 0.5rem 1rem;
+    margin-top: 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.9rem;
+    list-style: none;
+}
+.card.formulaire-bg .errorlist {
+    padding-left: 0;
+    margin-bottom: 1rem;
+}
+
+/* Responsive formulaire */
+@media (max-width: 992px) {
+    .card.formulaire-bg {
+        padding: 1rem 0.8rem;
+    }
+    .card-header.formulaire-header {
+        font-size: 1.4rem;
+    }
+    .btn, .form-control, label {
+        font-size: 1rem;
+    }
+}
+
+/* --- Tableaux (DataTables/Bootstrap) --- */
+.table {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 18px rgba(77,96,125,0.08);
+    background: #fff !important;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+.table th, .table td {
+    border: none !important;
+    padding: 0.9rem 1.2rem !important;
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+.table th {
+    background: #1d4d8e !important;
+    color: #fff !important;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    font-size: 0.9rem !important;
+    text-transform: uppercase;
+}
+.table thead th:first-child { border-top-left-radius: 12px; }
+.table thead th:last-child { border-top-right-radius: 12px; }
+.table tbody tr:last-child td:first-child { border-bottom-left-radius: 12px; }
+.table tbody tr:last-child td:last-child { border-bottom-right-radius: 12px; }
+@media (max-width: 768px) {
+    .table th {
+        font-size: 0.8rem !important;
+    }
+    .table th, .table td {
+        padding: 0.7rem 0.8rem !important;
+    }
+}
+.table tr { transition: background 0.2s; }
+.table tr:hover { background: #eef8f8 !important; }
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(29, 77, 142, 0.04);
+}
+.table-striped tbody tr:nth-of-type(odd):hover {
+    background: #eef8f8 !important;
+}
+
+/* Pagination DataTables */
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #1d4d8e !important;
+    border: 1px solid #dee2e6 !important;
+    margin-left: -1px !important;
+    padding: 0.4em 0.8em !important;
+    border-radius: 0 !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:first-child {
+    border-top-left-radius: 0.25rem !important;
+    border-bottom-left-radius: 0.25rem !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:last-child {
+    border-top-right-radius: 0.25rem !important;
+    border-bottom-right-radius: 0.25rem !important;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #eaf6ff !important;
+    border-color: #b3d7ff !important;
+    color: #1d4d8e !important;
+    z-index: 2;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: #1d4d8e !important;
+    color: #fff !important;
+    border-color: #1d4d8e !important;
+    z-index: 3;
+}
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info {
+    margin-bottom: 1rem;
+    color: #495057;
+    padding-top: 0.5rem;
+}
+.dataTables_wrapper .dataTables_filter input {
+    border-radius: 5px;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #ced4da;
+    margin-left: 0.5em;
+}
+.dataTables_wrapper .dataTables_length select {
+    border-radius: 5px;
+    padding: 0.3rem 0.6rem;
+    border: 1px solid #ced4da;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+/* --- Boutons d'accès rapide --- */
+.quick-access-btns .btn {
+    min-width: 170px;
+}
+
+/* --- Colonnes commentaire étroites --- */
+.td-commentaire, .th-commentaire {
+    max-width: 120px;
+    width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- Alertes/messages Bootstrap --- */
+.alert {
+    font-size: 1rem;
+    border-radius: 8px;
+    padding: 0.9rem 1.5rem;
+    margin-bottom: 1.5rem;
+    border-width: 1px;
+    border-left: 5px solid;
+}
+.alert-success {
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+    border-left-color: #198754;
+    color: #0f5132;
+}
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffecb5;
+    border-left-color: #ffc107;
+    color: #664d03;
+}
+.alert-info {
+    background-color: #cff4fc;
+    border-color: #b6effb;
+    border-left-color: #0dcaf0;
+    color: #055160;
+}
+.alert-danger:not(.card.formulaire-bg .alert-danger) {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    border-left-color: #dc3545;
+    color: #842029;
+}
+
+/* --- Footer --- */
+.footer-teelaf {
+    background: #343a40;
+    color: #adb5bd;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    padding: 2rem 0;
+    margin-top: 3rem;
+    text-align: center;
+}
+.footer-teelaf a {
+    color: #ffc107;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.footer-teelaf a:hover {
+    text-decoration: underline;
+    color: #fff;
+}
+.form-bg-blue {
+  background-color: #1d4d8e !important;
+  color: #fff !important;
+  border-radius: 0.5rem;
+  padding: 1.5rem 1rem;
+}
+.form-bg-blue label,
+.form-bg-blue .form-label {
+  color: #fff !important;
+}
+.form-bg-blue .form-control,
+.form-bg-blue input,
+.form-bg-blue select,
+.form-bg-blue textarea {
+  color: #1d4d8e !important;         /* Texte bleu foncé */
+  background-color: #fff !important; /* Fond blanc */
+  border: 1px solid #fff !important;
+}
+.form-bg-blue ::placeholder {
+  color: #1d4d8e !important;         /* Placeholder bleu foncé */
+  opacity: 1;
+}
