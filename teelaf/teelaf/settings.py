@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # --- SECURITY ---
 SECRET_KEY = 'django-insecure-w+o^!gp4l1x^%&$4lj(tib^aj=pjuru=jmh4)91g!yrp0u=1_5'
 DEBUG = True
-ALLOWED_HOSTS = ['*'] if DEBUG else ['votredomaine.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'teelaf.pythonanywhere.com']
 
 # --- APPLICATIONS ---
 INSTALLED_APPS = [
@@ -116,7 +116,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # --- LOGIN REDIRECT (après connexion) ---
-LOGIN_REDIRECT_URL = '/'  # Redirige vers la page d'accueil après connexion
+LOGIN_REDIRECT_URL = '/learners/'
 
 # --- CUSTOM SETTINGS ---
 TEELAF_CONFIG = {

@@ -1,1 +1,34 @@
-<a href="{% url 'quit' %}">Quitter</a>
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block content %}
+<div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 60vh;">
+    <div class="card shadow" style="min-width: 320px; max-width: 400px;">
+        <div class="card-body">
+            <h2 class="text-center mb-4">Connexion</h2>
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    Nom d'utilisateur ou mot de passe invalide.
+                </div>
+            {% endif %}
+            <form method="post" autocomplete="off">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Nom d'utilisateur</label>
+                    {{ form.username|add_class:"form-control" }}
+                    {% for error in form.username.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label for="id_password" class="form-label">Mot de passe</label>
+                    {{ form.password|add_class:"form-control" }}
+                    {% for error in form.password.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn btn-success w-100">Se connecter</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -11,9 +11,10 @@ urlpatterns = [
     path('learners/', include('learners.urls')),
     path('clients/', include('clients.urls')),
     path('Quit', views.quit_view, name='quit'),
-    path('accounts/login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    # Utilise le template registration/login.html pour la connexion
+    path('accounts/login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
     path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('accounts/profile/', views.profile_view, name='profile'),  # <-- Ajout de la vue profil
+    path('accounts/profile/', views.profile_view, name='profile'),
 
     # Applications spécifiques
     path('suivi_des_apprenants/', include('Suivi_des_apprenants.urls')),
